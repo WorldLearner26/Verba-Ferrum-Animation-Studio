@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Verba & Ferrum — CSS Pose Board v16</title>
+<style>
+:root{--paper:#efe0bd;--paper2:#f8efd4;--ink:#312116;--muted:#735d43;--red:#893029;--blue:#36547a;--line:#887050;--front:#d9af72;--front2:#e1bd83;--rear:#c89b60;--rear2:#d0a469;--pelvis:#c99559;--joint:#f8eed5}
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,"Times New Roman",serif;background:#c9b78c;color:var(--ink)}
+main{--root-x:0px;--root-y:0px;max-width:1200px;margin:14px auto;padding:15px;background:linear-gradient(var(--paper2),var(--paper));border:3px solid #6a5339}
+h1{margin:0;color:var(--red);font-size:clamp(27px,5vw,46px)}
+.sub{margin:6px 0 14px;color:var(--muted);line-height:1.4}
+.layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:14px}
+.panel{border:2px solid var(--line);background:#fff8e1b5;padding:13px}
+details{border:1px solid #a98e66;background:#fbefd0;margin:8px 0}
+summary{padding:10px 12px;font-weight:700;cursor:pointer}
+.controlBody{padding:0 10px 11px}
+.micro{font-size:.83rem;color:var(--muted);font-weight:700;margin:8px 0 4px}
+.choiceRow{display:flex;flex-wrap:wrap;gap:4px}
+.choice input{position:absolute;opacity:0;pointer-events:none}
+.choice span{display:inline-flex;min-width:49px;min-height:36px;align-items:center;justify-content:center;padding:4px 6px;border:1px solid #8f7552;background:#f8edcf;font-weight:700;font-size:.92rem}
+.choice input:checked + span{border:2px solid var(--blue);background:#e2cd94}
+.note{padding:9px;border-left:4px solid #ad8533;background:#fff5d7;color:var(--muted);line-height:1.4;margin-top:9px}
+svg{display:block;width:100%;height:auto;background:#f5e7c2;border:1px solid #b39b74}
+.seg{stroke:#312116;stroke-width:2.2;stroke-linejoin:round}
+.torso{fill:#ddb77c;stroke:#312116;stroke-width:3}
+.pelvis{fill:var(--pelvis);stroke:#312116;stroke-width:3}
+.head{fill:var(--front);stroke:#312116;stroke-width:3}
+.joint{fill:#f8eed5;stroke:#312116;stroke-width:3}
+.pivot{fill:#fff2ce;stroke:var(--red);stroke-width:3}
+
+#fighterRoot{transform:translate(var(--root-x),var(--root-y));transform-box:view-box;transform-origin:410px 535px;transition:transform .16s ease}
+
+/* Every movable joint combines local translation and local rotation. */
+#upperBody,#headGroup,#leftShoulderGroup,#leftElbowGroup,#leftWristGroup,
+#rightShoulderGroup,#rightElbowGroup,#rightWristGroup,
+#leftHipGroup,#leftKneeGroup,#leftAnkleGroup,
+#rightHipGroup,#rightKneeGroup,#rightAnkleGroup{
+  --r:0deg;--tx:0px;--ty:0px;
+  transform:translate(var(--tx),var(--ty)) rotate(var(--r));
+  transform-box:view-box;
+  transition:transform .14s ease;
+}
+#upperBody{transform-origin:410px 296px}
+#headGroup{transform-origin:410px 176px}
+#leftShoulderGroup{transform-origin:354px 193px}
+#leftElbowGroup{transform-origin:335px 280px}
+#leftWristGroup{transform-origin:320px 365px}
+#rightShoulderGroup{transform-origin:462px 193px}
+#rightElbowGroup{transform-origin:481px 279px}
+#rightWristGroup{transform-origin:494px 360px}
+#leftHipGroup{transform-origin:385px 327px}
+#leftKneeGroup{transform-origin:354px 442px}
+#leftAnkleGroup{transform-origin:343px 505px}
+#rightHipGroup{transform-origin:435px 327px}
+#rightKneeGroup{transform-origin:451px 443px}
+#rightAnkleGroup{transform-origin:456px 503px}
+
+main:has(#root_x_m140:checked){--root-x:-140px}
+main:has(#root_x_m100:checked){--root-x:-100px}
+main:has(#root_x_m60:checked){--root-x:-60px}
+main:has(#root_x_m30:checked){--root-x:-30px}
+main:has(#root_x_p0:checked){--root-x:0px}
+main:has(#root_x_p30:checked){--root-x:30px}
+main:has(#root_x_p60:checked){--root-x:60px}
+main:has(#root_x_p100:checked){--root-x:100px}
+main:has(#root_x_p140:checked){--root-x:140px}
+main:has(#root_y_m120:checked){--root-y:-120px}
+main:has(#root_y_m80:checked){--root-y:-80px}
+main:has(#root_y_m40:checked){--root-y:-40px}
+main:has(#root_y_m20:checked){--root-y:-20px}
+main:has(#root_y_p0:checked){--root-y:0px}
+main:has(#root_y_p20:checked){--root-y:20px}
+main:has(#root_y_p40:checked){--root-y:40px}
+main:has(#root_y_p80:checked){--root-y:80px}
+main:has(#root_y_p120:checked){--root-y:120px}
+main:has(#waist_r_m45:checked) #upperBody{--r:-45deg}
+main:has(#waist_r_m30:checked) #upperBody{--r:-30deg}
+main:has(#waist_r_m15:checked) #upperBody{--r:-15deg}
+main:has(#waist_r_p0:checked) #upperBody{--r:0deg}
+main:has(#waist_r_p15:checked) #upperBody{--r:15deg}
+main:has(#waist_r_p30:checked) #upperBody{--r:30deg}
+main:has(#waist_r_p45:checked) #upperBody{--r:45deg}
+main:has(#waist_x_m60:checked) #upperBody{--tx:-60px}
+main:has(#waist_x_m40:checked) #upperBody{--tx:-40px}
+main:has(#waist_x_m20:checked) #upperBody{--tx:-20px}
+main:has(#waist_x_m10:checked) #upperBody{--tx:-10px}
+main:has(#waist_x_p0:checked) #upperBody{--tx:0px}
+main:has(#waist_x_p10:checked) #upperBody{--tx:10px}
+main:has(#waist_x_p20:checked) #upperBody{--tx:20px}
+main:has(#waist_x_p40:checked) #upperBody{--tx:40px}
+main:has(#waist_x_p60:checked) #upperBody{--tx:60px}
+main:has(#waist_y_m60:checked) #upperBody{--ty:-60px}
+main:has(#waist_y_m40:checked) #upperBody{--ty:-40px}
+main:has(#waist_y_m20:checked) #upperBody{--ty:-20px}
+main:has(#waist_y_m10:checked) #upperBody{--ty:-10px}
+main:has(#waist_y_p0:checked) #upperBody{--ty:0px}
+main:has(#waist_y_p10:checked) #upperBody{--ty:10px}
+main:has(#waist_y_p20:checked) #upperBody{--ty:20px}
+main:has(#waist_y_p40:checked) #upperBody{--ty:40px}
+main:has(#waist_y_p60:checked) #upperBody{--ty:60px}
+main:has(#neck_r_m45:checked) #headGroup{--r:-45deg}
+main:has(#neck_r_m30:checked) #headGroup{--r:-30deg}
+main:has(#neck_r_m15:checked) #headGroup{--r:-15deg}
+main:has(#neck_r_p0:checked) #headGroup{--r:0deg}
+main:has(#neck_r_p15:checked) #headGroup{--r:15deg}
+main:has(#neck_r_p30:checked) #headGroup{--r:30deg}
+main:has(#neck_r_p45:checked) #headGroup{--r:45deg}
+main:has(#neck_x_m60:checked) #headGroup{--tx:-60px}
+main:has(#neck_x_m40:checked) #headGroup{--tx:-40px}
+main:has(#neck_x_m20:checked) #headGroup{--tx:-20px}
+main:has(#neck_x_m10:checked) #headGroup{--tx:-10px}
+main:has(#neck_x_p0:checked) #headGroup{--tx:0px}
+main:has(#neck_x_p10:checked) #headGroup{--tx:10px}
+main:has(#neck_x_p20:checked) #headGroup{--tx:20px}
+main:has(#neck_x_p40:checked) #headGroup{--tx:40px}
+main:has(#neck_x_p60:checked) #headGroup{--tx:60px}
+main:has(#neck_y_m60:checked) #headGroup{--ty:-60px}
+main:has(#neck_y_m40:checked) #headGroup{--ty:-40px}
+main:has(#neck_y_m20:checked) #headGroup{--ty:-20px}
+main:has(#neck_y_m10:checked) #headGroup{--ty:-10px}
+main:has(#neck_y_p0:checked) #headGroup{--ty:0px}
+main:has(#neck_y_p10:checked) #headGroup{--ty:10px}
+main:has(#neck_y_p20:checked) #headGroup{--ty:20px}
+main:has(#neck_y_p40:checked) #headGroup{--ty:40px}
+main:has(#neck_y_p60:checked) #headGroup{--ty:60px}
+main:has(#ls_r_m150:checked) #leftShoulderGroup{--r:-150deg}
+main:has(#ls_r_m120:checked) #leftShoulderGroup{--r:-120deg}
+main:has(#ls_r_m90:checked) #leftShoulderGroup{--r:-90deg}
+main:has(#ls_r_m60:checked) #leftShoulderGroup{--r:-60deg}
+main:has(#ls_r_m30:checked) #leftShoulderGroup{--r:-30deg}
+main:has(#ls_r_p0:checked) #leftShoulderGroup{--r:0deg}
+main:has(#ls_r_p30:checked) #leftShoulderGroup{--r:30deg}
+main:has(#ls_r_p60:checked) #leftShoulderGroup{--r:60deg}
+main:has(#ls_r_p90:checked) #leftShoulderGroup{--r:90deg}
+main:has(#ls_r_p120:checked) #leftShoulderGroup{--r:120deg}
+main:has(#ls_r_p150:checked) #leftShoulderGroup{--r:150deg}
+main:has(#ls_x_m60:checked) #leftShoulderGroup{--tx:-60px}
+main:has(#ls_x_m40:checked) #leftShoulderGroup{--tx:-40px}
+main:has(#ls_x_m20:checked) #leftShoulderGroup{--tx:-20px}
+main:has(#ls_x_m10:checked) #leftShoulderGroup{--tx:-10px}
+main:has(#ls_x_p0:checked) #leftShoulderGroup{--tx:0px}
+main:has(#ls_x_p10:checked) #leftShoulderGroup{--tx:10px}
+main:has(#ls_x_p20:checked) #leftShoulderGroup{--tx:20px}
+main:has(#ls_x_p40:checked) #leftShoulderGroup{--tx:40px}
+main:has(#ls_x_p60:checked) #leftShoulderGroup{--tx:60px}
+main:has(#ls_y_m60:checked) #leftShoulderGroup{--ty:-60px}
+main:has(#ls_y_m40:checked) #leftShoulderGroup{--ty:-40px}
+main:has(#ls_y_m20:checked) #leftShoulderGroup{--ty:-20px}
+main:has(#ls_y_m10:checked) #leftShoulderGroup{--ty:-10px}
+main:has(#ls_y_p0:checked) #leftShoulderGroup{--ty:0px}
+main:has(#ls_y_p10:checked) #leftShoulderGroup{--ty:10px}
+main:has(#ls_y_p20:checked) #leftShoulderGroup{--ty:20px}
+main:has(#ls_y_p40:checked) #leftShoulderGroup{--ty:40px}
+main:has(#ls_y_p60:checked) #leftShoulderGroup{--ty:60px}
+main:has(#le_r_m150:checked) #leftElbowGroup{--r:-150deg}
+main:has(#le_r_m120:checked) #leftElbowGroup{--r:-120deg}
+main:has(#le_r_m90:checked) #leftElbowGroup{--r:-90deg}
+main:has(#le_r_m60:checked) #leftElbowGroup{--r:-60deg}
+main:has(#le_r_m30:checked) #leftElbowGroup{--r:-30deg}
+main:has(#le_r_p0:checked) #leftElbowGroup{--r:0deg}
+main:has(#le_r_p30:checked) #leftElbowGroup{--r:30deg}
+main:has(#le_r_p60:checked) #leftElbowGroup{--r:60deg}
+main:has(#le_r_p90:checked) #leftElbowGroup{--r:90deg}
+main:has(#le_r_p120:checked) #leftElbowGroup{--r:120deg}
+main:has(#le_r_p150:checked) #leftElbowGroup{--r:150deg}
+main:has(#le_x_m60:checked) #leftElbowGroup{--tx:-60px}
+main:has(#le_x_m40:checked) #leftElbowGroup{--tx:-40px}
+main:has(#le_x_m20:checked) #leftElbowGroup{--tx:-20px}
+main:has(#le_x_m10:checked) #leftElbowGroup{--tx:-10px}
+main:has(#le_x_p0:checked) #leftElbowGroup{--tx:0px}
+main:has(#le_x_p10:checked) #leftElbowGroup{--tx:10px}
+main:has(#le_x_p20:checked) #leftElbowGroup{--tx:20px}
+main:has(#le_x_p40:checked) #leftElbowGroup{--tx:40px}
+main:has(#le_x_p60:checked) #leftElbowGroup{--tx:60px}
+main:has(#le_y_m60:checked) #leftElbowGroup{--ty:-60px}
+main:has(#le_y_m40:checked) #leftElbowGroup{--ty:-40px}
+main:has(#le_y_m20:checked) #leftElbowGroup{--ty:-20px}
+main:has(#le_y_m10:checked) #leftElbowGroup{--ty:-10px}
+main:has(#le_y_p0:checked) #leftElbowGroup{--ty:0px}
+main:has(#le_y_p10:checked) #leftElbowGroup{--ty:10px}
+main:has(#le_y_p20:checked) #leftElbowGroup{--ty:20px}
+main:has(#le_y_p40:checked) #leftElbowGroup{--ty:40px}
+main:has(#le_y_p60:checked) #leftElbowGroup{--ty:60px}
+main:has(#lw_r_m120:checked) #leftWristGroup{--r:-120deg}
+main:has(#lw_r_m90:checked) #leftWristGroup{--r:-90deg}
+main:has(#lw_r_m60:checked) #leftWristGroup{--r:-60deg}
+main:has(#lw_r_m30:checked) #leftWristGroup{--r:-30deg}
+main:has(#lw_r_p0:checked) #leftWristGroup{--r:0deg}
+main:has(#lw_r_p30:checked) #leftWristGroup{--r:30deg}
+main:has(#lw_r_p60:checked) #leftWristGroup{--r:60deg}
+main:has(#lw_r_p90:checked) #leftWristGroup{--r:90deg}
+main:has(#lw_r_p120:checked) #leftWristGroup{--r:120deg}
+main:has(#lw_x_m60:checked) #leftWristGroup{--tx:-60px}
+main:has(#lw_x_m40:checked) #leftWristGroup{--tx:-40px}
+main:has(#lw_x_m20:checked) #leftWristGroup{--tx:-20px}
+main:has(#lw_x_m10:checked) #leftWristGroup{--tx:-10px}
+main:has(#lw_x_p0:checked) #leftWristGroup{--tx:0px}
+main:has(#lw_x_p10:checked) #leftWristGroup{--tx:10px}
+main:has(#lw_x_p20:checked) #leftWristGroup{--tx:20px}
+main:has(#lw_x_p40:checked) #leftWristGroup{--tx:40px}
+main:has(#lw_x_p60:checked) #leftWristGroup{--tx:60px}
+main:has(#lw_y_m60:checked) #leftWristGroup{--ty:-60px}
+main:has(#lw_y_m40:checked) #leftWristGroup{--ty:-40px}
+main:has(#lw_y_m20:checked) #leftWristGroup{--ty:-20px}
+main:has(#lw_y_m10:checked) #leftWristGroup{--ty:-10px}
+main:has(#lw_y_p0:checked) #leftWristGroup{--ty:0px}
+main:has(#lw_y_p10:checked) #leftWristGroup{--ty:10px}
+main:has(#lw_y_p20:checked) #leftWristGroup{--ty:20px}
+main:has(#lw_y_p40:checked) #leftWristGroup{--ty:40px}
+main:has(#lw_y_p60:checked) #leftWristGroup{--ty:60px}
+main:has(#rs_r_m150:checked) #rightShoulderGroup{--r:-150deg}
+main:has(#rs_r_m120:checked) #rightShoulderGroup{--r:-120deg}
+main:has(#rs_r_m90:checked) #rightShoulderGroup{--r:-90deg}
+main:has(#rs_r_m60:checked) #rightShoulderGroup{--r:-60deg}
+main:has(#rs_r_m30:checked) #rightShoulderGroup{--r:-30deg}
+main:has(#rs_r_p0:checked) #rightShoulderGroup{--r:0deg}
+main:has(#rs_r_p30:checked) #rightShoulderGroup{--r:30deg}
+main:has(#rs_r_p60:checked) #rightShoulderGroup{--r:60deg}
+main:has(#rs_r_p90:checked) #rightShoulderGroup{--r:90deg}
+main:has(#rs_r_p120:checked) #rightShoulderGroup{--r:120deg}
+main:has(#rs_r_p150:checked) #rightShoulderGroup{--r:150deg}
+main:has(#rs_x_m60:checked) #rightShoulderGroup{--tx:-60px}
+main:has(#rs_x_m40:checked) #rightShoulderGroup{--tx:-40px}
+main:has(#rs_x_m20:checked) #rightShoulderGroup{--tx:-20px}
+main:has(#rs_x_m10:checked) #rightShoulderGroup{--tx:-10px}
+main:has(#rs_x_p0:checked) #rightShoulderGroup{--tx:0px}
+main:has(#rs_x_p10:checked) #rightShoulderGroup{--tx:10px}
+main:has(#rs_x_p20:checked) #rightShoulderGroup{--tx:20px}
+main:has(#rs_x_p40:checked) #rightShoulderGroup{--tx:40px}
+main:has(#rs_x_p60:checked) #rightShoulderGroup{--tx:60px}
+main:has(#rs_y_m60:checked) #rightShoulderGroup{--ty:-60px}
+main:has(#rs_y_m40:checked) #rightShoulderGroup{--ty:-40px}
+main:has(#rs_y_m20:checked) #rightShoulderGroup{--ty:-20px}
+main:has(#rs_y_m10:checked) #rightShoulderGroup{--ty:-10px}
+main:has(#rs_y_p0:checked) #rightShoulderGroup{--ty:0px}
+main:has(#rs_y_p10:checked) #rightShoulderGroup{--ty:10px}
+main:has(#rs_y_p20:checked) #rightShoulderGroup{--ty:20px}
+main:has(#rs_y_p40:checked) #rightShoulderGroup{--ty:40px}
+main:has(#rs_y_p60:checked) #rightShoulderGroup{--ty:60px}
+main:has(#re_r_m150:checked) #rightElbowGroup{--r:-150deg}
+main:has(#re_r_m120:checked) #rightElbowGroup{--r:-120deg}
+main:has(#re_r_m90:checked) #rightElbowGroup{--r:-90deg}
+main:has(#re_r_m60:checked) #rightElbowGroup{--r:-60deg}
+main:has(#re_r_m30:checked) #rightElbowGroup{--r:-30deg}
+main:has(#re_r_p0:checked) #rightElbowGroup{--r:0deg}
+main:has(#re_r_p30:checked) #rightElbowGroup{--r:30deg}
+main:has(#re_r_p60:checked) #rightElbowGroup{--r:60deg}
+main:has(#re_r_p90:checked) #rightElbowGroup{--r:90deg}
+main:has(#re_r_p120:checked) #rightElbowGroup{--r:120deg}
+main:has(#re_r_p150:checked) #rightElbowGroup{--r:150deg}
+main:has(#re_x_m60:checked) #rightElbowGroup{--tx:-60px}
+main:has(#re_x_m40:checked) #rightElbowGroup{--tx:-40px}
+main:has(#re_x_m20:checked) #rightElbowGroup{--tx:-20px}
+main:has(#re_x_m10:checked) #rightElbowGroup{--tx:-10px}
+main:has(#re_x_p0:checked) #rightElbowGroup{--tx:0px}
+main:has(#re_x_p10:checked) #rightElbowGroup{--tx:10px}
+main:has(#re_x_p20:checked) #rightElbowGroup{--tx:20px}
+main:has(#re_x_p40:checked) #rightElbowGroup{--tx:40px}
+main:has(#re_x_p60:checked) #rightElbowGroup{--tx:60px}
+main:has(#re_y_m60:checked) #rightElbowGroup{--ty:-60px}
+main:has(#re_y_m40:checked) #rightElbowGroup{--ty:-40px}
+main:has(#re_y_m20:checked) #rightElbowGroup{--ty:-20px}
+main:has(#re_y_m10:checked) #rightElbowGroup{--ty:-10px}
+main:has(#re_y_p0:checked) #rightElbowGroup{--ty:0px}
+main:has(#re_y_p10:checked) #rightElbowGroup{--ty:10px}
+main:has(#re_y_p20:checked) #rightElbowGroup{--ty:20px}
+main:has(#re_y_p40:checked) #rightElbowGroup{--ty:40px}
+main:has(#re_y_p60:checked) #rightElbowGroup{--ty:60px}
+main:has(#rw_r_m120:checked) #rightWristGroup{--r:-120deg}
+main:has(#rw_r_m90:checked) #rightWristGroup{--r:-90deg}
+main:has(#rw_r_m60:checked) #rightWristGroup{--r:-60deg}
+main:has(#rw_r_m30:checked) #rightWristGroup{--r:-30deg}
+main:has(#rw_r_p0:checked) #rightWristGroup{--r:0deg}
+main:has(#rw_r_p30:checked) #rightWristGroup{--r:30deg}
+main:has(#rw_r_p60:checked) #rightWristGroup{--r:60deg}
+main:has(#rw_r_p90:checked) #rightWristGroup{--r:90deg}
+main:has(#rw_r_p120:checked) #rightWristGroup{--r:120deg}
+main:has(#rw_x_m60:checked) #rightWristGroup{--tx:-60px}
+main:has(#rw_x_m40:checked) #rightWristGroup{--tx:-40px}
+main:has(#rw_x_m20:checked) #rightWristGroup{--tx:-20px}
+main:has(#rw_x_m10:checked) #rightWristGroup{--tx:-10px}
+main:has(#rw_x_p0:checked) #rightWristGroup{--tx:0px}
+main:has(#rw_x_p10:checked) #rightWristGroup{--tx:10px}
+main:has(#rw_x_p20:checked) #rightWristGroup{--tx:20px}
+main:has(#rw_x_p40:checked) #rightWristGroup{--tx:40px}
+main:has(#rw_x_p60:checked) #rightWristGroup{--tx:60px}
+main:has(#rw_y_m60:checked) #rightWristGroup{--ty:-60px}
+main:has(#rw_y_m40:checked) #rightWristGroup{--ty:-40px}
+main:has(#rw_y_m20:checked) #rightWristGroup{--ty:-20px}
+main:has(#rw_y_m10:checked) #rightWristGroup{--ty:-10px}
+main:has(#rw_y_p0:checked) #rightWristGroup{--ty:0px}
+main:has(#rw_y_p10:checked) #rightWristGroup{--ty:10px}
+main:has(#rw_y_p20:checked) #rightWristGroup{--ty:20px}
+main:has(#rw_y_p40:checked) #rightWristGroup{--ty:40px}
+main:has(#rw_y_p60:checked) #rightWristGroup{--ty:60px}
+main:has(#lh_r_m90:checked) #leftHipGroup{--r:-90deg}
+main:has(#lh_r_m60:checked) #leftHipGroup{--r:-60deg}
+main:has(#lh_r_m30:checked) #leftHipGroup{--r:-30deg}
+main:has(#lh_r_m15:checked) #leftHipGroup{--r:-15deg}
+main:has(#lh_r_p0:checked) #leftHipGroup{--r:0deg}
+main:has(#lh_r_p15:checked) #leftHipGroup{--r:15deg}
+main:has(#lh_r_p30:checked) #leftHipGroup{--r:30deg}
+main:has(#lh_r_p60:checked) #leftHipGroup{--r:60deg}
+main:has(#lh_r_p90:checked) #leftHipGroup{--r:90deg}
+main:has(#lh_x_m60:checked) #leftHipGroup{--tx:-60px}
+main:has(#lh_x_m40:checked) #leftHipGroup{--tx:-40px}
+main:has(#lh_x_m20:checked) #leftHipGroup{--tx:-20px}
+main:has(#lh_x_m10:checked) #leftHipGroup{--tx:-10px}
+main:has(#lh_x_p0:checked) #leftHipGroup{--tx:0px}
+main:has(#lh_x_p10:checked) #leftHipGroup{--tx:10px}
+main:has(#lh_x_p20:checked) #leftHipGroup{--tx:20px}
+main:has(#lh_x_p40:checked) #leftHipGroup{--tx:40px}
+main:has(#lh_x_p60:checked) #leftHipGroup{--tx:60px}
+main:has(#lh_y_m60:checked) #leftHipGroup{--ty:-60px}
+main:has(#lh_y_m40:checked) #leftHipGroup{--ty:-40px}
+main:has(#lh_y_m20:checked) #leftHipGroup{--ty:-20px}
+main:has(#lh_y_m10:checked) #leftHipGroup{--ty:-10px}
+main:has(#lh_y_p0:checked) #leftHipGroup{--ty:0px}
+main:has(#lh_y_p10:checked) #leftHipGroup{--ty:10px}
+main:has(#lh_y_p20:checked) #leftHipGroup{--ty:20px}
+main:has(#lh_y_p40:checked) #leftHipGroup{--ty:40px}
+main:has(#lh_y_p60:checked) #leftHipGroup{--ty:60px}
+main:has(#lk_r_m30:checked) #leftKneeGroup{--r:-30deg}
+main:has(#lk_r_p0:checked) #leftKneeGroup{--r:0deg}
+main:has(#lk_r_p30:checked) #leftKneeGroup{--r:30deg}
+main:has(#lk_r_p60:checked) #leftKneeGroup{--r:60deg}
+main:has(#lk_r_p90:checked) #leftKneeGroup{--r:90deg}
+main:has(#lk_r_p120:checked) #leftKneeGroup{--r:120deg}
+main:has(#lk_r_p150:checked) #leftKneeGroup{--r:150deg}
+main:has(#lk_x_m60:checked) #leftKneeGroup{--tx:-60px}
+main:has(#lk_x_m40:checked) #leftKneeGroup{--tx:-40px}
+main:has(#lk_x_m20:checked) #leftKneeGroup{--tx:-20px}
+main:has(#lk_x_m10:checked) #leftKneeGroup{--tx:-10px}
+main:has(#lk_x_p0:checked) #leftKneeGroup{--tx:0px}
+main:has(#lk_x_p10:checked) #leftKneeGroup{--tx:10px}
+main:has(#lk_x_p20:checked) #leftKneeGroup{--tx:20px}
+main:has(#lk_x_p40:checked) #leftKneeGroup{--tx:40px}
+main:has(#lk_x_p60:checked) #leftKneeGroup{--tx:60px}
+main:has(#lk_y_m60:checked) #leftKneeGroup{--ty:-60px}
+main:has(#lk_y_m40:checked) #leftKneeGroup{--ty:-40px}
+main:has(#lk_y_m20:checked) #leftKneeGroup{--ty:-20px}
+main:has(#lk_y_m10:checked) #leftKneeGroup{--ty:-10px}
+main:has(#lk_y_p0:checked) #leftKneeGroup{--ty:0px}
+main:has(#lk_y_p10:checked) #leftKneeGroup{--ty:10px}
+main:has(#lk_y_p20:checked) #leftKneeGroup{--ty:20px}
+main:has(#lk_y_p40:checked) #leftKneeGroup{--ty:40px}
+main:has(#lk_y_p60:checked) #leftKneeGroup{--ty:60px}
+main:has(#la_r_m60:checked) #leftAnkleGroup{--r:-60deg}
+main:has(#la_r_m45:checked) #leftAnkleGroup{--r:-45deg}
+main:has(#la_r_m30:checked) #leftAnkleGroup{--r:-30deg}
+main:has(#la_r_m15:checked) #leftAnkleGroup{--r:-15deg}
+main:has(#la_r_p0:checked) #leftAnkleGroup{--r:0deg}
+main:has(#la_r_p15:checked) #leftAnkleGroup{--r:15deg}
+main:has(#la_r_p30:checked) #leftAnkleGroup{--r:30deg}
+main:has(#la_r_p45:checked) #leftAnkleGroup{--r:45deg}
+main:has(#la_r_p60:checked) #leftAnkleGroup{--r:60deg}
+main:has(#la_x_m60:checked) #leftAnkleGroup{--tx:-60px}
+main:has(#la_x_m40:checked) #leftAnkleGroup{--tx:-40px}
+main:has(#la_x_m20:checked) #leftAnkleGroup{--tx:-20px}
+main:has(#la_x_m10:checked) #leftAnkleGroup{--tx:-10px}
+main:has(#la_x_p0:checked) #leftAnkleGroup{--tx:0px}
+main:has(#la_x_p10:checked) #leftAnkleGroup{--tx:10px}
+main:has(#la_x_p20:checked) #leftAnkleGroup{--tx:20px}
+main:has(#la_x_p40:checked) #leftAnkleGroup{--tx:40px}
+main:has(#la_x_p60:checked) #leftAnkleGroup{--tx:60px}
+main:has(#la_y_m60:checked) #leftAnkleGroup{--ty:-60px}
+main:has(#la_y_m40:checked) #leftAnkleGroup{--ty:-40px}
+main:has(#la_y_m20:checked) #leftAnkleGroup{--ty:-20px}
+main:has(#la_y_m10:checked) #leftAnkleGroup{--ty:-10px}
+main:has(#la_y_p0:checked) #leftAnkleGroup{--ty:0px}
+main:has(#la_y_p10:checked) #leftAnkleGroup{--ty:10px}
+main:has(#la_y_p20:checked) #leftAnkleGroup{--ty:20px}
+main:has(#la_y_p40:checked) #leftAnkleGroup{--ty:40px}
+main:has(#la_y_p60:checked) #leftAnkleGroup{--ty:60px}
+main:has(#rh_r_m90:checked) #rightHipGroup{--r:-90deg}
+main:has(#rh_r_m60:checked) #rightHipGroup{--r:-60deg}
+main:has(#rh_r_m30:checked) #rightHipGroup{--r:-30deg}
+main:has(#rh_r_m15:checked) #rightHipGroup{--r:-15deg}
+main:has(#rh_r_p0:checked) #rightHipGroup{--r:0deg}
+main:has(#rh_r_p15:checked) #rightHipGroup{--r:15deg}
+main:has(#rh_r_p30:checked) #rightHipGroup{--r:30deg}
+main:has(#rh_r_p60:checked) #rightHipGroup{--r:60deg}
+main:has(#rh_r_p90:checked) #rightHipGroup{--r:90deg}
+main:has(#rh_x_m60:checked) #rightHipGroup{--tx:-60px}
+main:has(#rh_x_m40:checked) #rightHipGroup{--tx:-40px}
+main:has(#rh_x_m20:checked) #rightHipGroup{--tx:-20px}
+main:has(#rh_x_m10:checked) #rightHipGroup{--tx:-10px}
+main:has(#rh_x_p0:checked) #rightHipGroup{--tx:0px}
+main:has(#rh_x_p10:checked) #rightHipGroup{--tx:10px}
+main:has(#rh_x_p20:checked) #rightHipGroup{--tx:20px}
+main:has(#rh_x_p40:checked) #rightHipGroup{--tx:40px}
+main:has(#rh_x_p60:checked) #rightHipGroup{--tx:60px}
+main:has(#rh_y_m60:checked) #rightHipGroup{--ty:-60px}
+main:has(#rh_y_m40:checked) #rightHipGroup{--ty:-40px}
+main:has(#rh_y_m20:checked) #rightHipGroup{--ty:-20px}
+main:has(#rh_y_m10:checked) #rightHipGroup{--ty:-10px}
+main:has(#rh_y_p0:checked) #rightHipGroup{--ty:0px}
+main:has(#rh_y_p10:checked) #rightHipGroup{--ty:10px}
+main:has(#rh_y_p20:checked) #rightHipGroup{--ty:20px}
+main:has(#rh_y_p40:checked) #rightHipGroup{--ty:40px}
+main:has(#rh_y_p60:checked) #rightHipGroup{--ty:60px}
+main:has(#rk_r_m30:checked) #rightKneeGroup{--r:-30deg}
+main:has(#rk_r_p0:checked) #rightKneeGroup{--r:0deg}
+main:has(#rk_r_p30:checked) #rightKneeGroup{--r:30deg}
+main:has(#rk_r_p60:checked) #rightKneeGroup{--r:60deg}
+main:has(#rk_r_p90:checked) #rightKneeGroup{--r:90deg}
+main:has(#rk_r_p120:checked) #rightKneeGroup{--r:120deg}
+main:has(#rk_r_p150:checked) #rightKneeGroup{--r:150deg}
+main:has(#rk_x_m60:checked) #rightKneeGroup{--tx:-60px}
+main:has(#rk_x_m40:checked) #rightKneeGroup{--tx:-40px}
+main:has(#rk_x_m20:checked) #rightKneeGroup{--tx:-20px}
+main:has(#rk_x_m10:checked) #rightKneeGroup{--tx:-10px}
+main:has(#rk_x_p0:checked) #rightKneeGroup{--tx:0px}
+main:has(#rk_x_p10:checked) #rightKneeGroup{--tx:10px}
+main:has(#rk_x_p20:checked) #rightKneeGroup{--tx:20px}
+main:has(#rk_x_p40:checked) #rightKneeGroup{--tx:40px}
+main:has(#rk_x_p60:checked) #rightKneeGroup{--tx:60px}
+main:has(#rk_y_m60:checked) #rightKneeGroup{--ty:-60px}
+main:has(#rk_y_m40:checked) #rightKneeGroup{--ty:-40px}
+main:has(#rk_y_m20:checked) #rightKneeGroup{--ty:-20px}
+main:has(#rk_y_m10:checked) #rightKneeGroup{--ty:-10px}
+main:has(#rk_y_p0:checked) #rightKneeGroup{--ty:0px}
+main:has(#rk_y_p10:checked) #rightKneeGroup{--ty:10px}
+main:has(#rk_y_p20:checked) #rightKneeGroup{--ty:20px}
+main:has(#rk_y_p40:checked) #rightKneeGroup{--ty:40px}
+main:has(#rk_y_p60:checked) #rightKneeGroup{--ty:60px}
+main:has(#ra_r_m60:checked) #rightAnkleGroup{--r:-60deg}
+main:has(#ra_r_m45:checked) #rightAnkleGroup{--r:-45deg}
+main:has(#ra_r_m30:checked) #rightAnkleGroup{--r:-30deg}
+main:has(#ra_r_m15:checked) #rightAnkleGroup{--r:-15deg}
+main:has(#ra_r_p0:checked) #rightAnkleGroup{--r:0deg}
+main:has(#ra_r_p15:checked) #rightAnkleGroup{--r:15deg}
+main:has(#ra_r_p30:checked) #rightAnkleGroup{--r:30deg}
+main:has(#ra_r_p45:checked) #rightAnkleGroup{--r:45deg}
+main:has(#ra_r_p60:checked) #rightAnkleGroup{--r:60deg}
+main:has(#ra_x_m60:checked) #rightAnkleGroup{--tx:-60px}
+main:has(#ra_x_m40:checked) #rightAnkleGroup{--tx:-40px}
+main:has(#ra_x_m20:checked) #rightAnkleGroup{--tx:-20px}
+main:has(#ra_x_m10:checked) #rightAnkleGroup{--tx:-10px}
+main:has(#ra_x_p0:checked) #rightAnkleGroup{--tx:0px}
+main:has(#ra_x_p10:checked) #rightAnkleGroup{--tx:10px}
+main:has(#ra_x_p20:checked) #rightAnkleGroup{--tx:20px}
+main:has(#ra_x_p40:checked) #rightAnkleGroup{--tx:40px}
+main:has(#ra_x_p60:checked) #rightAnkleGroup{--tx:60px}
+main:has(#ra_y_m60:checked) #rightAnkleGroup{--ty:-60px}
+main:has(#ra_y_m40:checked) #rightAnkleGroup{--ty:-40px}
+main:has(#ra_y_m20:checked) #rightAnkleGroup{--ty:-20px}
+main:has(#ra_y_m10:checked) #rightAnkleGroup{--ty:-10px}
+main:has(#ra_y_p0:checked) #rightAnkleGroup{--ty:0px}
+main:has(#ra_y_p10:checked) #rightAnkleGroup{--ty:10px}
+main:has(#ra_y_p20:checked) #rightAnkleGroup{--ty:20px}
+main:has(#ra_y_p40:checked) #rightAnkleGroup{--ty:40px}
+main:has(#ra_y_p60:checked) #rightAnkleGroup{--ty:60px}
+
+.legend{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:13px}
+.legend>div{border:1px solid var(--line);background:#fff6dc96;padding:8px;line-height:1.3}
+.small{font-size:.88rem;color:var(--muted)}
+@media(max-width:930px){.layout{grid-template-columns:1fr}.legend{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>Tabula Positūrārum III — Joint Translation</h1>
+<p class="sub">Now every articulated joint can be rotated <em>and</em> translated locally in X/Y space. Moving a parent joint carries its child chain with it, so you can reposition limbs without breaking their articulation.</p>
+
+<div class="layout">
+<section class="panel">
+
+  <details open>
+    <summary>Whole fighter — spatial position</summary>
+    <div class="controlBody">
+      <div class="micro">Horizontal</div>
+      <div class="choiceRow"><label class="choice"><input id="root_x_m140" type="radio" name="root_x"><span>←←←</span></label><label class="choice"><input id="root_x_m100" type="radio" name="root_x"><span>←←</span></label><label class="choice"><input id="root_x_m60" type="radio" name="root_x"><span>←</span></label><label class="choice"><input id="root_x_m30" type="radio" name="root_x"><span>◀</span></label><label class="choice"><input id="root_x_p0" type="radio" name="root_x" checked><span>Center</span></label><label class="choice"><input id="root_x_p30" type="radio" name="root_x"><span>▶</span></label><label class="choice"><input id="root_x_p60" type="radio" name="root_x"><span>→</span></label><label class="choice"><input id="root_x_p100" type="radio" name="root_x"><span>→→</span></label><label class="choice"><input id="root_x_p140" type="radio" name="root_x"><span>→→→</span></label></div>
+      <div class="micro">Vertical</div>
+      <div class="choiceRow"><label class="choice"><input id="root_y_m120" type="radio" name="root_y"><span>↑↑↑</span></label><label class="choice"><input id="root_y_m80" type="radio" name="root_y"><span>↑↑</span></label><label class="choice"><input id="root_y_m40" type="radio" name="root_y"><span>↑</span></label><label class="choice"><input id="root_y_m20" type="radio" name="root_y"><span>▲</span></label><label class="choice"><input id="root_y_p0" type="radio" name="root_y" checked><span>Level</span></label><label class="choice"><input id="root_y_p20" type="radio" name="root_y"><span>▼</span></label><label class="choice"><input id="root_y_p40" type="radio" name="root_y"><span>↓</span></label><label class="choice"><input id="root_y_p80" type="radio" name="root_y"><span>↓↓</span></label><label class="choice"><input id="root_y_p120" type="radio" name="root_y"><span>↓↓↓</span></label></div>
+    </div>
+  </details>
+
+  
+  <details>
+    <summary>Waist / lumbar — torso chain</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="waist_r_m45" type="radio" name="waist_angle"><span>-45°</span></label><label class="choice"><input id="waist_r_m30" type="radio" name="waist_angle"><span>-30°</span></label><label class="choice"><input id="waist_r_m15" type="radio" name="waist_angle"><span>-15°</span></label><label class="choice"><input id="waist_r_p0" type="radio" name="waist_angle" checked><span>0°</span></label><label class="choice"><input id="waist_r_p15" type="radio" name="waist_angle"><span>+15°</span></label><label class="choice"><input id="waist_r_p30" type="radio" name="waist_angle"><span>+30°</span></label><label class="choice"><input id="waist_r_p45" type="radio" name="waist_angle"><span>+45°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="waist_x_m60" type="radio" name="waist_x"><span>-60</span></label><label class="choice"><input id="waist_x_m40" type="radio" name="waist_x"><span>-40</span></label><label class="choice"><input id="waist_x_m20" type="radio" name="waist_x"><span>-20</span></label><label class="choice"><input id="waist_x_m10" type="radio" name="waist_x"><span>-10</span></label><label class="choice"><input id="waist_x_p0" type="radio" name="waist_x" checked><span>0</span></label><label class="choice"><input id="waist_x_p10" type="radio" name="waist_x"><span>+10</span></label><label class="choice"><input id="waist_x_p20" type="radio" name="waist_x"><span>+20</span></label><label class="choice"><input id="waist_x_p40" type="radio" name="waist_x"><span>+40</span></label><label class="choice"><input id="waist_x_p60" type="radio" name="waist_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="waist_y_m60" type="radio" name="waist_y"><span>-60</span></label><label class="choice"><input id="waist_y_m40" type="radio" name="waist_y"><span>-40</span></label><label class="choice"><input id="waist_y_m20" type="radio" name="waist_y"><span>-20</span></label><label class="choice"><input id="waist_y_m10" type="radio" name="waist_y"><span>-10</span></label><label class="choice"><input id="waist_y_p0" type="radio" name="waist_y" checked><span>0</span></label><label class="choice"><input id="waist_y_p10" type="radio" name="waist_y"><span>+10</span></label><label class="choice"><input id="waist_y_p20" type="radio" name="waist_y"><span>+20</span></label><label class="choice"><input id="waist_y_p40" type="radio" name="waist_y"><span>+40</span></label><label class="choice"><input id="waist_y_p60" type="radio" name="waist_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Neck / head</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="neck_r_m45" type="radio" name="neck_angle"><span>-45°</span></label><label class="choice"><input id="neck_r_m30" type="radio" name="neck_angle"><span>-30°</span></label><label class="choice"><input id="neck_r_m15" type="radio" name="neck_angle"><span>-15°</span></label><label class="choice"><input id="neck_r_p0" type="radio" name="neck_angle" checked><span>0°</span></label><label class="choice"><input id="neck_r_p15" type="radio" name="neck_angle"><span>+15°</span></label><label class="choice"><input id="neck_r_p30" type="radio" name="neck_angle"><span>+30°</span></label><label class="choice"><input id="neck_r_p45" type="radio" name="neck_angle"><span>+45°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="neck_x_m60" type="radio" name="neck_x"><span>-60</span></label><label class="choice"><input id="neck_x_m40" type="radio" name="neck_x"><span>-40</span></label><label class="choice"><input id="neck_x_m20" type="radio" name="neck_x"><span>-20</span></label><label class="choice"><input id="neck_x_m10" type="radio" name="neck_x"><span>-10</span></label><label class="choice"><input id="neck_x_p0" type="radio" name="neck_x" checked><span>0</span></label><label class="choice"><input id="neck_x_p10" type="radio" name="neck_x"><span>+10</span></label><label class="choice"><input id="neck_x_p20" type="radio" name="neck_x"><span>+20</span></label><label class="choice"><input id="neck_x_p40" type="radio" name="neck_x"><span>+40</span></label><label class="choice"><input id="neck_x_p60" type="radio" name="neck_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="neck_y_m60" type="radio" name="neck_y"><span>-60</span></label><label class="choice"><input id="neck_y_m40" type="radio" name="neck_y"><span>-40</span></label><label class="choice"><input id="neck_y_m20" type="radio" name="neck_y"><span>-20</span></label><label class="choice"><input id="neck_y_m10" type="radio" name="neck_y"><span>-10</span></label><label class="choice"><input id="neck_y_p0" type="radio" name="neck_y" checked><span>0</span></label><label class="choice"><input id="neck_y_p10" type="radio" name="neck_y"><span>+10</span></label><label class="choice"><input id="neck_y_p20" type="radio" name="neck_y"><span>+20</span></label><label class="choice"><input id="neck_y_p40" type="radio" name="neck_y"><span>+40</span></label><label class="choice"><input id="neck_y_p60" type="radio" name="neck_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left shoulder — moves whole arm</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="ls_r_m150" type="radio" name="ls_angle"><span>-150°</span></label><label class="choice"><input id="ls_r_m120" type="radio" name="ls_angle"><span>-120°</span></label><label class="choice"><input id="ls_r_m90" type="radio" name="ls_angle"><span>-90°</span></label><label class="choice"><input id="ls_r_m60" type="radio" name="ls_angle"><span>-60°</span></label><label class="choice"><input id="ls_r_m30" type="radio" name="ls_angle"><span>-30°</span></label><label class="choice"><input id="ls_r_p0" type="radio" name="ls_angle" checked><span>0°</span></label><label class="choice"><input id="ls_r_p30" type="radio" name="ls_angle"><span>+30°</span></label><label class="choice"><input id="ls_r_p60" type="radio" name="ls_angle"><span>+60°</span></label><label class="choice"><input id="ls_r_p90" type="radio" name="ls_angle"><span>+90°</span></label><label class="choice"><input id="ls_r_p120" type="radio" name="ls_angle"><span>+120°</span></label><label class="choice"><input id="ls_r_p150" type="radio" name="ls_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="ls_x_m60" type="radio" name="ls_x"><span>-60</span></label><label class="choice"><input id="ls_x_m40" type="radio" name="ls_x"><span>-40</span></label><label class="choice"><input id="ls_x_m20" type="radio" name="ls_x"><span>-20</span></label><label class="choice"><input id="ls_x_m10" type="radio" name="ls_x"><span>-10</span></label><label class="choice"><input id="ls_x_p0" type="radio" name="ls_x" checked><span>0</span></label><label class="choice"><input id="ls_x_p10" type="radio" name="ls_x"><span>+10</span></label><label class="choice"><input id="ls_x_p20" type="radio" name="ls_x"><span>+20</span></label><label class="choice"><input id="ls_x_p40" type="radio" name="ls_x"><span>+40</span></label><label class="choice"><input id="ls_x_p60" type="radio" name="ls_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="ls_y_m60" type="radio" name="ls_y"><span>-60</span></label><label class="choice"><input id="ls_y_m40" type="radio" name="ls_y"><span>-40</span></label><label class="choice"><input id="ls_y_m20" type="radio" name="ls_y"><span>-20</span></label><label class="choice"><input id="ls_y_m10" type="radio" name="ls_y"><span>-10</span></label><label class="choice"><input id="ls_y_p0" type="radio" name="ls_y" checked><span>0</span></label><label class="choice"><input id="ls_y_p10" type="radio" name="ls_y"><span>+10</span></label><label class="choice"><input id="ls_y_p20" type="radio" name="ls_y"><span>+20</span></label><label class="choice"><input id="ls_y_p40" type="radio" name="ls_y"><span>+40</span></label><label class="choice"><input id="ls_y_p60" type="radio" name="ls_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left elbow — moves forearm + hand</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="le_r_m150" type="radio" name="le_angle"><span>-150°</span></label><label class="choice"><input id="le_r_m120" type="radio" name="le_angle"><span>-120°</span></label><label class="choice"><input id="le_r_m90" type="radio" name="le_angle"><span>-90°</span></label><label class="choice"><input id="le_r_m60" type="radio" name="le_angle"><span>-60°</span></label><label class="choice"><input id="le_r_m30" type="radio" name="le_angle"><span>-30°</span></label><label class="choice"><input id="le_r_p0" type="radio" name="le_angle" checked><span>0°</span></label><label class="choice"><input id="le_r_p30" type="radio" name="le_angle"><span>+30°</span></label><label class="choice"><input id="le_r_p60" type="radio" name="le_angle"><span>+60°</span></label><label class="choice"><input id="le_r_p90" type="radio" name="le_angle"><span>+90°</span></label><label class="choice"><input id="le_r_p120" type="radio" name="le_angle"><span>+120°</span></label><label class="choice"><input id="le_r_p150" type="radio" name="le_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="le_x_m60" type="radio" name="le_x"><span>-60</span></label><label class="choice"><input id="le_x_m40" type="radio" name="le_x"><span>-40</span></label><label class="choice"><input id="le_x_m20" type="radio" name="le_x"><span>-20</span></label><label class="choice"><input id="le_x_m10" type="radio" name="le_x"><span>-10</span></label><label class="choice"><input id="le_x_p0" type="radio" name="le_x" checked><span>0</span></label><label class="choice"><input id="le_x_p10" type="radio" name="le_x"><span>+10</span></label><label class="choice"><input id="le_x_p20" type="radio" name="le_x"><span>+20</span></label><label class="choice"><input id="le_x_p40" type="radio" name="le_x"><span>+40</span></label><label class="choice"><input id="le_x_p60" type="radio" name="le_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="le_y_m60" type="radio" name="le_y"><span>-60</span></label><label class="choice"><input id="le_y_m40" type="radio" name="le_y"><span>-40</span></label><label class="choice"><input id="le_y_m20" type="radio" name="le_y"><span>-20</span></label><label class="choice"><input id="le_y_m10" type="radio" name="le_y"><span>-10</span></label><label class="choice"><input id="le_y_p0" type="radio" name="le_y" checked><span>0</span></label><label class="choice"><input id="le_y_p10" type="radio" name="le_y"><span>+10</span></label><label class="choice"><input id="le_y_p20" type="radio" name="le_y"><span>+20</span></label><label class="choice"><input id="le_y_p40" type="radio" name="le_y"><span>+40</span></label><label class="choice"><input id="le_y_p60" type="radio" name="le_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left wrist / hand</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="lw_r_m120" type="radio" name="lw_angle"><span>-120°</span></label><label class="choice"><input id="lw_r_m90" type="radio" name="lw_angle"><span>-90°</span></label><label class="choice"><input id="lw_r_m60" type="radio" name="lw_angle"><span>-60°</span></label><label class="choice"><input id="lw_r_m30" type="radio" name="lw_angle"><span>-30°</span></label><label class="choice"><input id="lw_r_p0" type="radio" name="lw_angle" checked><span>0°</span></label><label class="choice"><input id="lw_r_p30" type="radio" name="lw_angle"><span>+30°</span></label><label class="choice"><input id="lw_r_p60" type="radio" name="lw_angle"><span>+60°</span></label><label class="choice"><input id="lw_r_p90" type="radio" name="lw_angle"><span>+90°</span></label><label class="choice"><input id="lw_r_p120" type="radio" name="lw_angle"><span>+120°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="lw_x_m60" type="radio" name="lw_x"><span>-60</span></label><label class="choice"><input id="lw_x_m40" type="radio" name="lw_x"><span>-40</span></label><label class="choice"><input id="lw_x_m20" type="radio" name="lw_x"><span>-20</span></label><label class="choice"><input id="lw_x_m10" type="radio" name="lw_x"><span>-10</span></label><label class="choice"><input id="lw_x_p0" type="radio" name="lw_x" checked><span>0</span></label><label class="choice"><input id="lw_x_p10" type="radio" name="lw_x"><span>+10</span></label><label class="choice"><input id="lw_x_p20" type="radio" name="lw_x"><span>+20</span></label><label class="choice"><input id="lw_x_p40" type="radio" name="lw_x"><span>+40</span></label><label class="choice"><input id="lw_x_p60" type="radio" name="lw_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="lw_y_m60" type="radio" name="lw_y"><span>-60</span></label><label class="choice"><input id="lw_y_m40" type="radio" name="lw_y"><span>-40</span></label><label class="choice"><input id="lw_y_m20" type="radio" name="lw_y"><span>-20</span></label><label class="choice"><input id="lw_y_m10" type="radio" name="lw_y"><span>-10</span></label><label class="choice"><input id="lw_y_p0" type="radio" name="lw_y" checked><span>0</span></label><label class="choice"><input id="lw_y_p10" type="radio" name="lw_y"><span>+10</span></label><label class="choice"><input id="lw_y_p20" type="radio" name="lw_y"><span>+20</span></label><label class="choice"><input id="lw_y_p40" type="radio" name="lw_y"><span>+40</span></label><label class="choice"><input id="lw_y_p60" type="radio" name="lw_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right shoulder — moves whole arm</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="rs_r_m150" type="radio" name="rs_angle"><span>-150°</span></label><label class="choice"><input id="rs_r_m120" type="radio" name="rs_angle"><span>-120°</span></label><label class="choice"><input id="rs_r_m90" type="radio" name="rs_angle"><span>-90°</span></label><label class="choice"><input id="rs_r_m60" type="radio" name="rs_angle"><span>-60°</span></label><label class="choice"><input id="rs_r_m30" type="radio" name="rs_angle"><span>-30°</span></label><label class="choice"><input id="rs_r_p0" type="radio" name="rs_angle" checked><span>0°</span></label><label class="choice"><input id="rs_r_p30" type="radio" name="rs_angle"><span>+30°</span></label><label class="choice"><input id="rs_r_p60" type="radio" name="rs_angle"><span>+60°</span></label><label class="choice"><input id="rs_r_p90" type="radio" name="rs_angle"><span>+90°</span></label><label class="choice"><input id="rs_r_p120" type="radio" name="rs_angle"><span>+120°</span></label><label class="choice"><input id="rs_r_p150" type="radio" name="rs_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="rs_x_m60" type="radio" name="rs_x"><span>-60</span></label><label class="choice"><input id="rs_x_m40" type="radio" name="rs_x"><span>-40</span></label><label class="choice"><input id="rs_x_m20" type="radio" name="rs_x"><span>-20</span></label><label class="choice"><input id="rs_x_m10" type="radio" name="rs_x"><span>-10</span></label><label class="choice"><input id="rs_x_p0" type="radio" name="rs_x" checked><span>0</span></label><label class="choice"><input id="rs_x_p10" type="radio" name="rs_x"><span>+10</span></label><label class="choice"><input id="rs_x_p20" type="radio" name="rs_x"><span>+20</span></label><label class="choice"><input id="rs_x_p40" type="radio" name="rs_x"><span>+40</span></label><label class="choice"><input id="rs_x_p60" type="radio" name="rs_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="rs_y_m60" type="radio" name="rs_y"><span>-60</span></label><label class="choice"><input id="rs_y_m40" type="radio" name="rs_y"><span>-40</span></label><label class="choice"><input id="rs_y_m20" type="radio" name="rs_y"><span>-20</span></label><label class="choice"><input id="rs_y_m10" type="radio" name="rs_y"><span>-10</span></label><label class="choice"><input id="rs_y_p0" type="radio" name="rs_y" checked><span>0</span></label><label class="choice"><input id="rs_y_p10" type="radio" name="rs_y"><span>+10</span></label><label class="choice"><input id="rs_y_p20" type="radio" name="rs_y"><span>+20</span></label><label class="choice"><input id="rs_y_p40" type="radio" name="rs_y"><span>+40</span></label><label class="choice"><input id="rs_y_p60" type="radio" name="rs_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right elbow — moves forearm + hand</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="re_r_m150" type="radio" name="re_angle"><span>-150°</span></label><label class="choice"><input id="re_r_m120" type="radio" name="re_angle"><span>-120°</span></label><label class="choice"><input id="re_r_m90" type="radio" name="re_angle"><span>-90°</span></label><label class="choice"><input id="re_r_m60" type="radio" name="re_angle"><span>-60°</span></label><label class="choice"><input id="re_r_m30" type="radio" name="re_angle"><span>-30°</span></label><label class="choice"><input id="re_r_p0" type="radio" name="re_angle" checked><span>0°</span></label><label class="choice"><input id="re_r_p30" type="radio" name="re_angle"><span>+30°</span></label><label class="choice"><input id="re_r_p60" type="radio" name="re_angle"><span>+60°</span></label><label class="choice"><input id="re_r_p90" type="radio" name="re_angle"><span>+90°</span></label><label class="choice"><input id="re_r_p120" type="radio" name="re_angle"><span>+120°</span></label><label class="choice"><input id="re_r_p150" type="radio" name="re_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="re_x_m60" type="radio" name="re_x"><span>-60</span></label><label class="choice"><input id="re_x_m40" type="radio" name="re_x"><span>-40</span></label><label class="choice"><input id="re_x_m20" type="radio" name="re_x"><span>-20</span></label><label class="choice"><input id="re_x_m10" type="radio" name="re_x"><span>-10</span></label><label class="choice"><input id="re_x_p0" type="radio" name="re_x" checked><span>0</span></label><label class="choice"><input id="re_x_p10" type="radio" name="re_x"><span>+10</span></label><label class="choice"><input id="re_x_p20" type="radio" name="re_x"><span>+20</span></label><label class="choice"><input id="re_x_p40" type="radio" name="re_x"><span>+40</span></label><label class="choice"><input id="re_x_p60" type="radio" name="re_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="re_y_m60" type="radio" name="re_y"><span>-60</span></label><label class="choice"><input id="re_y_m40" type="radio" name="re_y"><span>-40</span></label><label class="choice"><input id="re_y_m20" type="radio" name="re_y"><span>-20</span></label><label class="choice"><input id="re_y_m10" type="radio" name="re_y"><span>-10</span></label><label class="choice"><input id="re_y_p0" type="radio" name="re_y" checked><span>0</span></label><label class="choice"><input id="re_y_p10" type="radio" name="re_y"><span>+10</span></label><label class="choice"><input id="re_y_p20" type="radio" name="re_y"><span>+20</span></label><label class="choice"><input id="re_y_p40" type="radio" name="re_y"><span>+40</span></label><label class="choice"><input id="re_y_p60" type="radio" name="re_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right wrist / hand</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="rw_r_m120" type="radio" name="rw_angle"><span>-120°</span></label><label class="choice"><input id="rw_r_m90" type="radio" name="rw_angle"><span>-90°</span></label><label class="choice"><input id="rw_r_m60" type="radio" name="rw_angle"><span>-60°</span></label><label class="choice"><input id="rw_r_m30" type="radio" name="rw_angle"><span>-30°</span></label><label class="choice"><input id="rw_r_p0" type="radio" name="rw_angle" checked><span>0°</span></label><label class="choice"><input id="rw_r_p30" type="radio" name="rw_angle"><span>+30°</span></label><label class="choice"><input id="rw_r_p60" type="radio" name="rw_angle"><span>+60°</span></label><label class="choice"><input id="rw_r_p90" type="radio" name="rw_angle"><span>+90°</span></label><label class="choice"><input id="rw_r_p120" type="radio" name="rw_angle"><span>+120°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="rw_x_m60" type="radio" name="rw_x"><span>-60</span></label><label class="choice"><input id="rw_x_m40" type="radio" name="rw_x"><span>-40</span></label><label class="choice"><input id="rw_x_m20" type="radio" name="rw_x"><span>-20</span></label><label class="choice"><input id="rw_x_m10" type="radio" name="rw_x"><span>-10</span></label><label class="choice"><input id="rw_x_p0" type="radio" name="rw_x" checked><span>0</span></label><label class="choice"><input id="rw_x_p10" type="radio" name="rw_x"><span>+10</span></label><label class="choice"><input id="rw_x_p20" type="radio" name="rw_x"><span>+20</span></label><label class="choice"><input id="rw_x_p40" type="radio" name="rw_x"><span>+40</span></label><label class="choice"><input id="rw_x_p60" type="radio" name="rw_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="rw_y_m60" type="radio" name="rw_y"><span>-60</span></label><label class="choice"><input id="rw_y_m40" type="radio" name="rw_y"><span>-40</span></label><label class="choice"><input id="rw_y_m20" type="radio" name="rw_y"><span>-20</span></label><label class="choice"><input id="rw_y_m10" type="radio" name="rw_y"><span>-10</span></label><label class="choice"><input id="rw_y_p0" type="radio" name="rw_y" checked><span>0</span></label><label class="choice"><input id="rw_y_p10" type="radio" name="rw_y"><span>+10</span></label><label class="choice"><input id="rw_y_p20" type="radio" name="rw_y"><span>+20</span></label><label class="choice"><input id="rw_y_p40" type="radio" name="rw_y"><span>+40</span></label><label class="choice"><input id="rw_y_p60" type="radio" name="rw_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left hip — moves whole leg</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="lh_r_m90" type="radio" name="lh_angle"><span>-90°</span></label><label class="choice"><input id="lh_r_m60" type="radio" name="lh_angle"><span>-60°</span></label><label class="choice"><input id="lh_r_m30" type="radio" name="lh_angle"><span>-30°</span></label><label class="choice"><input id="lh_r_m15" type="radio" name="lh_angle"><span>-15°</span></label><label class="choice"><input id="lh_r_p0" type="radio" name="lh_angle" checked><span>0°</span></label><label class="choice"><input id="lh_r_p15" type="radio" name="lh_angle"><span>+15°</span></label><label class="choice"><input id="lh_r_p30" type="radio" name="lh_angle"><span>+30°</span></label><label class="choice"><input id="lh_r_p60" type="radio" name="lh_angle"><span>+60°</span></label><label class="choice"><input id="lh_r_p90" type="radio" name="lh_angle"><span>+90°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="lh_x_m60" type="radio" name="lh_x"><span>-60</span></label><label class="choice"><input id="lh_x_m40" type="radio" name="lh_x"><span>-40</span></label><label class="choice"><input id="lh_x_m20" type="radio" name="lh_x"><span>-20</span></label><label class="choice"><input id="lh_x_m10" type="radio" name="lh_x"><span>-10</span></label><label class="choice"><input id="lh_x_p0" type="radio" name="lh_x" checked><span>0</span></label><label class="choice"><input id="lh_x_p10" type="radio" name="lh_x"><span>+10</span></label><label class="choice"><input id="lh_x_p20" type="radio" name="lh_x"><span>+20</span></label><label class="choice"><input id="lh_x_p40" type="radio" name="lh_x"><span>+40</span></label><label class="choice"><input id="lh_x_p60" type="radio" name="lh_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="lh_y_m60" type="radio" name="lh_y"><span>-60</span></label><label class="choice"><input id="lh_y_m40" type="radio" name="lh_y"><span>-40</span></label><label class="choice"><input id="lh_y_m20" type="radio" name="lh_y"><span>-20</span></label><label class="choice"><input id="lh_y_m10" type="radio" name="lh_y"><span>-10</span></label><label class="choice"><input id="lh_y_p0" type="radio" name="lh_y" checked><span>0</span></label><label class="choice"><input id="lh_y_p10" type="radio" name="lh_y"><span>+10</span></label><label class="choice"><input id="lh_y_p20" type="radio" name="lh_y"><span>+20</span></label><label class="choice"><input id="lh_y_p40" type="radio" name="lh_y"><span>+40</span></label><label class="choice"><input id="lh_y_p60" type="radio" name="lh_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left knee — moves calf + foot</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="lk_r_m30" type="radio" name="lk_angle"><span>-30°</span></label><label class="choice"><input id="lk_r_p0" type="radio" name="lk_angle" checked><span>0°</span></label><label class="choice"><input id="lk_r_p30" type="radio" name="lk_angle"><span>+30°</span></label><label class="choice"><input id="lk_r_p60" type="radio" name="lk_angle"><span>+60°</span></label><label class="choice"><input id="lk_r_p90" type="radio" name="lk_angle"><span>+90°</span></label><label class="choice"><input id="lk_r_p120" type="radio" name="lk_angle"><span>+120°</span></label><label class="choice"><input id="lk_r_p150" type="radio" name="lk_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="lk_x_m60" type="radio" name="lk_x"><span>-60</span></label><label class="choice"><input id="lk_x_m40" type="radio" name="lk_x"><span>-40</span></label><label class="choice"><input id="lk_x_m20" type="radio" name="lk_x"><span>-20</span></label><label class="choice"><input id="lk_x_m10" type="radio" name="lk_x"><span>-10</span></label><label class="choice"><input id="lk_x_p0" type="radio" name="lk_x" checked><span>0</span></label><label class="choice"><input id="lk_x_p10" type="radio" name="lk_x"><span>+10</span></label><label class="choice"><input id="lk_x_p20" type="radio" name="lk_x"><span>+20</span></label><label class="choice"><input id="lk_x_p40" type="radio" name="lk_x"><span>+40</span></label><label class="choice"><input id="lk_x_p60" type="radio" name="lk_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="lk_y_m60" type="radio" name="lk_y"><span>-60</span></label><label class="choice"><input id="lk_y_m40" type="radio" name="lk_y"><span>-40</span></label><label class="choice"><input id="lk_y_m20" type="radio" name="lk_y"><span>-20</span></label><label class="choice"><input id="lk_y_m10" type="radio" name="lk_y"><span>-10</span></label><label class="choice"><input id="lk_y_p0" type="radio" name="lk_y" checked><span>0</span></label><label class="choice"><input id="lk_y_p10" type="radio" name="lk_y"><span>+10</span></label><label class="choice"><input id="lk_y_p20" type="radio" name="lk_y"><span>+20</span></label><label class="choice"><input id="lk_y_p40" type="radio" name="lk_y"><span>+40</span></label><label class="choice"><input id="lk_y_p60" type="radio" name="lk_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-left ankle / foot</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="la_r_m60" type="radio" name="la_angle"><span>-60°</span></label><label class="choice"><input id="la_r_m45" type="radio" name="la_angle"><span>-45°</span></label><label class="choice"><input id="la_r_m30" type="radio" name="la_angle"><span>-30°</span></label><label class="choice"><input id="la_r_m15" type="radio" name="la_angle"><span>-15°</span></label><label class="choice"><input id="la_r_p0" type="radio" name="la_angle" checked><span>0°</span></label><label class="choice"><input id="la_r_p15" type="radio" name="la_angle"><span>+15°</span></label><label class="choice"><input id="la_r_p30" type="radio" name="la_angle"><span>+30°</span></label><label class="choice"><input id="la_r_p45" type="radio" name="la_angle"><span>+45°</span></label><label class="choice"><input id="la_r_p60" type="radio" name="la_angle"><span>+60°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="la_x_m60" type="radio" name="la_x"><span>-60</span></label><label class="choice"><input id="la_x_m40" type="radio" name="la_x"><span>-40</span></label><label class="choice"><input id="la_x_m20" type="radio" name="la_x"><span>-20</span></label><label class="choice"><input id="la_x_m10" type="radio" name="la_x"><span>-10</span></label><label class="choice"><input id="la_x_p0" type="radio" name="la_x" checked><span>0</span></label><label class="choice"><input id="la_x_p10" type="radio" name="la_x"><span>+10</span></label><label class="choice"><input id="la_x_p20" type="radio" name="la_x"><span>+20</span></label><label class="choice"><input id="la_x_p40" type="radio" name="la_x"><span>+40</span></label><label class="choice"><input id="la_x_p60" type="radio" name="la_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="la_y_m60" type="radio" name="la_y"><span>-60</span></label><label class="choice"><input id="la_y_m40" type="radio" name="la_y"><span>-40</span></label><label class="choice"><input id="la_y_m20" type="radio" name="la_y"><span>-20</span></label><label class="choice"><input id="la_y_m10" type="radio" name="la_y"><span>-10</span></label><label class="choice"><input id="la_y_p0" type="radio" name="la_y" checked><span>0</span></label><label class="choice"><input id="la_y_p10" type="radio" name="la_y"><span>+10</span></label><label class="choice"><input id="la_y_p20" type="radio" name="la_y"><span>+20</span></label><label class="choice"><input id="la_y_p40" type="radio" name="la_y"><span>+40</span></label><label class="choice"><input id="la_y_p60" type="radio" name="la_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right hip — moves whole leg</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="rh_r_m90" type="radio" name="rh_angle"><span>-90°</span></label><label class="choice"><input id="rh_r_m60" type="radio" name="rh_angle"><span>-60°</span></label><label class="choice"><input id="rh_r_m30" type="radio" name="rh_angle"><span>-30°</span></label><label class="choice"><input id="rh_r_m15" type="radio" name="rh_angle"><span>-15°</span></label><label class="choice"><input id="rh_r_p0" type="radio" name="rh_angle" checked><span>0°</span></label><label class="choice"><input id="rh_r_p15" type="radio" name="rh_angle"><span>+15°</span></label><label class="choice"><input id="rh_r_p30" type="radio" name="rh_angle"><span>+30°</span></label><label class="choice"><input id="rh_r_p60" type="radio" name="rh_angle"><span>+60°</span></label><label class="choice"><input id="rh_r_p90" type="radio" name="rh_angle"><span>+90°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="rh_x_m60" type="radio" name="rh_x"><span>-60</span></label><label class="choice"><input id="rh_x_m40" type="radio" name="rh_x"><span>-40</span></label><label class="choice"><input id="rh_x_m20" type="radio" name="rh_x"><span>-20</span></label><label class="choice"><input id="rh_x_m10" type="radio" name="rh_x"><span>-10</span></label><label class="choice"><input id="rh_x_p0" type="radio" name="rh_x" checked><span>0</span></label><label class="choice"><input id="rh_x_p10" type="radio" name="rh_x"><span>+10</span></label><label class="choice"><input id="rh_x_p20" type="radio" name="rh_x"><span>+20</span></label><label class="choice"><input id="rh_x_p40" type="radio" name="rh_x"><span>+40</span></label><label class="choice"><input id="rh_x_p60" type="radio" name="rh_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="rh_y_m60" type="radio" name="rh_y"><span>-60</span></label><label class="choice"><input id="rh_y_m40" type="radio" name="rh_y"><span>-40</span></label><label class="choice"><input id="rh_y_m20" type="radio" name="rh_y"><span>-20</span></label><label class="choice"><input id="rh_y_m10" type="radio" name="rh_y"><span>-10</span></label><label class="choice"><input id="rh_y_p0" type="radio" name="rh_y" checked><span>0</span></label><label class="choice"><input id="rh_y_p10" type="radio" name="rh_y"><span>+10</span></label><label class="choice"><input id="rh_y_p20" type="radio" name="rh_y"><span>+20</span></label><label class="choice"><input id="rh_y_p40" type="radio" name="rh_y"><span>+40</span></label><label class="choice"><input id="rh_y_p60" type="radio" name="rh_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right knee — moves calf + foot</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="rk_r_m30" type="radio" name="rk_angle"><span>-30°</span></label><label class="choice"><input id="rk_r_p0" type="radio" name="rk_angle" checked><span>0°</span></label><label class="choice"><input id="rk_r_p30" type="radio" name="rk_angle"><span>+30°</span></label><label class="choice"><input id="rk_r_p60" type="radio" name="rk_angle"><span>+60°</span></label><label class="choice"><input id="rk_r_p90" type="radio" name="rk_angle"><span>+90°</span></label><label class="choice"><input id="rk_r_p120" type="radio" name="rk_angle"><span>+120°</span></label><label class="choice"><input id="rk_r_p150" type="radio" name="rk_angle"><span>+150°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="rk_x_m60" type="radio" name="rk_x"><span>-60</span></label><label class="choice"><input id="rk_x_m40" type="radio" name="rk_x"><span>-40</span></label><label class="choice"><input id="rk_x_m20" type="radio" name="rk_x"><span>-20</span></label><label class="choice"><input id="rk_x_m10" type="radio" name="rk_x"><span>-10</span></label><label class="choice"><input id="rk_x_p0" type="radio" name="rk_x" checked><span>0</span></label><label class="choice"><input id="rk_x_p10" type="radio" name="rk_x"><span>+10</span></label><label class="choice"><input id="rk_x_p20" type="radio" name="rk_x"><span>+20</span></label><label class="choice"><input id="rk_x_p40" type="radio" name="rk_x"><span>+40</span></label><label class="choice"><input id="rk_x_p60" type="radio" name="rk_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="rk_y_m60" type="radio" name="rk_y"><span>-60</span></label><label class="choice"><input id="rk_y_m40" type="radio" name="rk_y"><span>-40</span></label><label class="choice"><input id="rk_y_m20" type="radio" name="rk_y"><span>-20</span></label><label class="choice"><input id="rk_y_m10" type="radio" name="rk_y"><span>-10</span></label><label class="choice"><input id="rk_y_p0" type="radio" name="rk_y" checked><span>0</span></label><label class="choice"><input id="rk_y_p10" type="radio" name="rk_y"><span>+10</span></label><label class="choice"><input id="rk_y_p20" type="radio" name="rk_y"><span>+20</span></label><label class="choice"><input id="rk_y_p40" type="radio" name="rk_y"><span>+40</span></label><label class="choice"><input id="rk_y_p60" type="radio" name="rk_y"><span>+60</span></label></div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Viewer-right ankle / foot</summary>
+    <div class="controlBody">
+      <div class="micro">Rotate</div>
+      <div class="choiceRow"><label class="choice"><input id="ra_r_m60" type="radio" name="ra_angle"><span>-60°</span></label><label class="choice"><input id="ra_r_m45" type="radio" name="ra_angle"><span>-45°</span></label><label class="choice"><input id="ra_r_m30" type="radio" name="ra_angle"><span>-30°</span></label><label class="choice"><input id="ra_r_m15" type="radio" name="ra_angle"><span>-15°</span></label><label class="choice"><input id="ra_r_p0" type="radio" name="ra_angle" checked><span>0°</span></label><label class="choice"><input id="ra_r_p15" type="radio" name="ra_angle"><span>+15°</span></label><label class="choice"><input id="ra_r_p30" type="radio" name="ra_angle"><span>+30°</span></label><label class="choice"><input id="ra_r_p45" type="radio" name="ra_angle"><span>+45°</span></label><label class="choice"><input id="ra_r_p60" type="radio" name="ra_angle"><span>+60°</span></label></div>
+      <div class="micro">Move horizontally</div>
+      <div class="choiceRow"><label class="choice"><input id="ra_x_m60" type="radio" name="ra_x"><span>-60</span></label><label class="choice"><input id="ra_x_m40" type="radio" name="ra_x"><span>-40</span></label><label class="choice"><input id="ra_x_m20" type="radio" name="ra_x"><span>-20</span></label><label class="choice"><input id="ra_x_m10" type="radio" name="ra_x"><span>-10</span></label><label class="choice"><input id="ra_x_p0" type="radio" name="ra_x" checked><span>0</span></label><label class="choice"><input id="ra_x_p10" type="radio" name="ra_x"><span>+10</span></label><label class="choice"><input id="ra_x_p20" type="radio" name="ra_x"><span>+20</span></label><label class="choice"><input id="ra_x_p40" type="radio" name="ra_x"><span>+40</span></label><label class="choice"><input id="ra_x_p60" type="radio" name="ra_x"><span>+60</span></label></div>
+      <div class="micro">Move vertically</div>
+      <div class="choiceRow"><label class="choice"><input id="ra_y_m60" type="radio" name="ra_y"><span>-60</span></label><label class="choice"><input id="ra_y_m40" type="radio" name="ra_y"><span>-40</span></label><label class="choice"><input id="ra_y_m20" type="radio" name="ra_y"><span>-20</span></label><label class="choice"><input id="ra_y_m10" type="radio" name="ra_y"><span>-10</span></label><label class="choice"><input id="ra_y_p0" type="radio" name="ra_y" checked><span>0</span></label><label class="choice"><input id="ra_y_p10" type="radio" name="ra_y"><span>+10</span></label><label class="choice"><input id="ra_y_p20" type="radio" name="ra_y"><span>+20</span></label><label class="choice"><input id="ra_y_p40" type="radio" name="ra_y"><span>+40</span></label><label class="choice"><input id="ra_y_p60" type="radio" name="ra_y"><span>+60</span></label></div>
+    </div>
+  </details>
+
+  <div class="note"><b>Hierarchy:</b> shoulder translation carries elbow + wrist; elbow translation carries wrist; hip translation carries knee + ankle; knee translation carries ankle. This lets you make strong silhouettes without pulling a hand or foot away from the limb that owns it.</div>
+</section>
+
+<section class="panel">
+<svg viewBox="0 0 820 620" role="img" aria-label="CSS-only articulated mannequin with local joint translation">
+  <rect x="18" y="18" width="784" height="580" rx="16" fill="none" stroke="#887050" stroke-width="2"/>
+  <line x1="50" y1="535" x2="770" y2="535" stroke="#887050" stroke-width="3"/>
+  <text x="56" y="560" font-size="14" fill="#735d43">ground</text>
+
+  <g id="fighterRoot">
+    <!-- rear leg chain -->
+    <g id="rightHipGroup">
+      <path class="seg" fill="#c89b60" d="M435 327 Q455 358 462 398 Q462 421 451 443 L431 438 Q434 403 421 346Z"/>
+      <circle class="joint" cx="435" cy="327" r="12"/>
+      <g id="rightKneeGroup">
+        <path class="seg" fill="#d0a469" d="M451 443 Q459 471 466 501 L447 509 Q438 481 431 451Z"/>
+        <circle class="joint" cx="451" cy="443" r="9"/>
+        <g id="rightAnkleGroup">
+          <path class="seg" fill="#c89b60" d="M466 499 Q484 506 495 512 Q502 519 489 523 L447 522 Q440 516 447 508Z"/>
+          <circle class="joint" cx="456" cy="503" r="7"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- front/lead leg chain -->
+    <g id="leftHipGroup">
+      <path class="seg" fill="#d9af72" d="M385 327 Q357 351 343 395 Q342 419 354 442 L377 437 Q373 402 401 346Z"/>
+      <circle class="joint" cx="385" cy="327" r="12"/>
+      <g id="leftKneeGroup">
+        <path class="seg" fill="#e1bd83" d="M354 442 Q340 470 333 502 L353 510 Q367 482 377 450Z"/>
+        <circle class="joint" cx="354" cy="442" r="9"/>
+        <g id="leftAnkleGroup">
+          <path class="seg" fill="#d9af72" d="M333 500 Q311 507 299 513 Q292 521 306 525 L354 522 Q361 515 353 509Z"/>
+          <circle class="joint" cx="343" cy="505" r="7"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- pelvis -->
+    <path class="pelvis" d="M374 296 Q410 282 446 296 L458 322 Q435 343 410 343 Q385 343 362 322Z"/>
+    <circle class="joint" cx="385" cy="327" r="12"/>
+    <circle class="joint" cx="435" cy="327" r="12"/>
+    <circle class="pivot" cx="410" cy="296" r="10"/>
+    <text x="423" y="292" font-size="12" fill="#893029">lumbar</text>
+
+    <!-- upper body chain -->
+    <g id="upperBody">
+
+      <!-- rear arm -->
+      <g id="rightShoulderGroup">
+        <path class="seg" fill="#c89b60" d="M462 193 Q486 208 497 243 Q496 262 481 279 L462 269 Q472 243 453 208Z"/>
+        <circle class="joint" cx="462" cy="193" r="11"/>
+        <g id="rightElbowGroup">
+          <path class="seg" fill="#d0a469" d="M481 279 Q497 304 504 334 Q505 350 494 360 L478 354 Q479 327 463 291Z"/>
+          <circle class="joint" cx="481" cy="279" r="8"/>
+          <g id="rightWristGroup">
+            <path class="seg" fill="#d0a469" d="M489 353 Q501 352 505 360 L501 372 Q492 376 484 367Z"/>
+            <circle class="joint" cx="494" cy="360" r="7"/>
+          </g>
+        </g>
+      </g>
+
+      <path class="torso" d="M354 190 Q410 165 462 190 Q455 236 444 278 Q429 298 410 300 Q390 298 374 278 Q362 236 354 190Z"/>
+
+      <g id="headGroup">
+        <rect x="402" y="171" width="16" height="24" rx="7" fill="#d9af72" stroke="#312116" stroke-width="2"/>
+        <ellipse class="head" cx="410" cy="126" rx="28" ry="35"/>
+        <circle class="joint" cx="410" cy="176" r="7"/>
+      </g>
+
+      <!-- front arm -->
+      <g id="leftShoulderGroup">
+        <path class="seg" fill="#d9af72" d="M354 193 Q330 209 319 244 Q320 263 335 280 L354 270 Q344 243 363 208Z"/>
+        <circle class="joint" cx="354" cy="193" r="11"/>
+        <g id="leftElbowGroup">
+          <path class="seg" fill="#e1bd83" d="M335 280 Q318 306 309 338 Q308 354 320 365 L336 358 Q337 330 354 291Z"/>
+          <circle class="joint" cx="335" cy="280" r="8"/>
+          <g id="leftWristGroup">
+            <path class="seg" fill="#e1bd83" d="M315 357 Q304 357 301 365 L306 376 Q316 379 324 369Z"/>
+            <circle class="joint" cx="320" cy="365" r="7"/>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <text x="555" y="80" font-size="14" fill="#735d43">Rotate + local X/Y</text>
+  <text x="555" y="102" font-size="14" fill="#735d43">per articulated joint</text>
+  <text x="555" y="124" font-size="14" fill="#735d43">CSS-only / no scripts</text>
+</svg>
+
+<div class="note"><b>This is the big one:</b> rotation controls pose the skeleton around its pivots; local X/Y controls let you deliberately cheat the 2D silhouette when needed. That gives you much closer control over anticipation, impact, recoil, stepping, crouching, and exaggerated manuscript-style motion.</div>
+</section>
+</div>
+
+<div class="legend">
+  <div><b>Parent translation</b><br><span class="small">Move a shoulder or hip and its entire limb follows.</span></div>
+  <div><b>Child translation</b><br><span class="small">Move only the elbow, wrist, knee, or ankle chain when you need finer posing.</span></div>
+  <div><b>Rotation stays independent</b><br><span class="small">Every joint keeps its angle controls alongside X/Y movement.</span></div>
+  <div><b>Whole rig still moves</b><br><span class="small">Global X/Y remains separate from local joint translation.</span></div>
+</div>
+</main>
+</body>
+</html>
