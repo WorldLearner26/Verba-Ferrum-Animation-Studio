@@ -1,0 +1,88 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verba & Ferrum II — Stage 1</title><style>body{background:#171b20;color:#eee;font:16px system-ui;margin:20px auto;max-width:650px;padding:0 15px}h1{font-size:25px}canvas{width:100%;height:340px;background:#222a32;border-radius:12px}button,select{font:inherit;padding:10px;margin:4px;background:#354453;color:white;border:1px solid #657585;border-radius:8px}pre{white-space:pre-wrap;background:#222a32;padding:15px;border-radius:8px}small{color:#bac5cf}</style><h1>Verba & Ferrum II</h1><p>Stage 1 · Skeleton runtime benchmark · v0.1.0</p><canvas id="c" width="600" height="680"></canvas><p><label>Rig view <select id="view"></select></label><label>Characters <select id="count"><option>1</option><option>5</option><option>10</option><option>25</option><option>50</option></select></label></p><button id="run">Run 5-second rig test</button><button id="basic">Run browser baseline</button><button id="stop">Stop</button><pre id="out">Ready. Run the browser baseline, then the rig test.</pre><small>Procedural test movement, not the saved jab. No artwork or storage. Keep this tab visible during testing.</small><script>var J_BY_VIEW={"original":{"lumbar":[432,628],"chest":[448,340],"neck":[441,237],"head":[460,145],"shoulder_L":[280,392],"elbow_L":[228,539],"wrist_L":[217,746],"hand_L":[225,830],"shoulder_R":[585,376],"elbow_R":[574,547],"wrist_R":[644,725],"hand_R":[660,820],"hip_L":[374,823],"knee_L":[347,1027],"ankle_L":[284,1292],"foot_L":[330,1370],"hip_R":[516,826],"knee_R":[521,1028],"ankle_R":[513,1304],"foot_R":[590,1360],"pelvis":[438,750],"root":[438,760]},"front":{"shoulder_L":[271.4,340.4],"shoulder_R":[601.8,340.4],"elbow_L":[210.4,538.2],"elbow_R":[662.8,538.2],"wrist_L":[179.7,735.8],"wrist_R":[693.5,735.8],"hand_L":[167.5,806.5],"hand_R":[705.7,806.5],"hip_L":[351.0,806.5],"hip_R":[522.2,806.5],"knee_L":[338.7,1039.3],"knee_R":[534.5,1039.3],"ankle_L":[314.3,1307.6],"ankle_R":[558.9,1307.6],"foot_L":[302.1,1385.3],"foot_R":[571.2,1385.3],"chest":[436.59999999999997,295.4],"neck":[436.59999999999997,195.39999999999998],"head":[436.59999999999997,105.39999999999998],"pelvis":[436.6,731.5],"lumbar":[436.6,608.5],"root":[436.6,741.5]},"right_3q":{"shoulder_L":[310.3,341.7],"shoulder_R":[533.2,341.7],"elbow_L":[257.3,541.3],"elbow_R":[618.0,541.3],"wrist_L":[230.7,741.0],"wrist_R":[665.9,741.0],"hand_L":[220.0,812.3],"hand_R":[676.5,812.3],"hip_L":[374.0,812.3],"hip_R":[501.3,812.3],"knee_L":[368.6,1047.8],"knee_R":[506.7,1047.8],"ankle_L":[347.5,1318.8],"ankle_R":[549.2,1318.8],"foot_L":[336.9,1397.1],"foot_R":[575.7,1397.1],"chest":[421.75,296.7],"neck":[421.75,196.7],"head":[421.75,106.69999999999999],"pelvis":[437.65,737.3],"lumbar":[437.65,614.3],"root":[437.65,747.3]},"right_profile":{"shoulder_L":[411.5,340.2],"shoulder_R":[440.3,340.2],"elbow_L":[393.3,539.0],"elbow_R":[434.9,539.0],"wrist_L":[398.5,737.9],"wrist_R":[437.6,737.9],"hand_L":[406.3,809.0],"hand_R":[440.3,809.0],"hip_L":[429.8,809.0],"hip_R":[448.0,809.0],"knee_L":[432.5,1043.2],"knee_R":[448.0,1043.2],"ankle_L":[432.5,1313.2],"ankle_R":[448.0,1313.2],"foot_L":[453.4,1391.1],"foot_R":[468.9,1391.1],"chest":[425.9,295.2],"neck":[425.9,195.2],"head":[425.9,105.19999999999999],"pelvis":[438.9,734.0],"lumbar":[438.9,611.0],"root":[438.9,744.0]},"back":{"shoulder_L":[275.3,338.3],"shoulder_R":[600.0,338.3],"elbow_L":[209.2,536.1],"elbow_R":[666.1,536.1],"wrist_L":[179.1,733.7],"wrist_R":[696.2,733.7],"hand_L":[167.1,804.4],"hand_R":[708.2,804.4],"hip_L":[353.5,804.4],"hip_R":[521.8,804.4],"knee_L":[341.4,1037.2],"knee_R":[533.8,1037.2],"ankle_L":[317.4,1305.5],"ankle_R":[557.9,1305.5],"foot_L":[293.3,1383.2],"foot_R":[581.9,1383.2],"chest":[437.65,293.3],"neck":[437.65,193.3],"head":[437.65,103.30000000000001],"pelvis":[437.65,729.4],"lumbar":[437.65,606.4],"root":[437.65,739.4]},"left_3q":{"shoulder_L":[351.8,341.0],"shoulder_R":[552.1,341.0],"elbow_L":[275.5,538.8],"elbow_R":[599.8,538.8],"wrist_L":[232.6,736.8],"wrist_R":[623.6,736.8],"hand_L":[223.1,807.5],"hand_R":[633.1,807.5],"hip_L":[380.4,807.5],"hip_R":[494.9,807.5],"knee_L":[375.7,1040.7],"knee_R":[499.6,1040.7],"ankle_L":[337.5,1309.4],"ankle_R":[518.7,1309.4],"foot_L":[313.7,1387.2],"foot_R":[528.2,1387.2],"chest":[451.95000000000005,296.0],"neck":[451.95000000000005,196.0],"head":[451.95000000000005,106.0],"pelvis":[437.65,732.5],"lumbar":[437.65,609.5],"root":[437.65,742.5]},"left_profile":{"shoulder_L":[434.9,339.0],"shoulder_R":[464.2,339.0],"elbow_L":[440.3,536.8],"elbow_R":[482.8,536.8],"wrist_L":[437.6,734.7],"wrist_R":[477.4,734.7],"hand_L":[434.9,805.4],"hand_R":[469.6,805.4],"hip_L":[427.1,805.4],"hip_R":[445.5,805.4],"knee_L":[427.1,1038.7],"knee_R":[443.0,1038.7],"ankle_L":[427.1,1307.4],"ankle_R":[443.0,1307.4],"foot_L":[405.7,1385.1],"foot_R":[421.7,1385.1],"chest":[449.54999999999995,294.0],"neck":[449.54999999999995,194.0],"head":[449.54999999999995,104.0],"pelvis":[436.3,730.4],"lumbar":[436.3,607.4],"root":[436.3,740.4]}};
+var initial={
+ globalX:0,globalY:0,
+ pelvisX:0,pelvisY:0,pelvisRot:0,
+ torsoX:0,torsoY:0,waist:0,
+ headX:0,headY:0,head:0,
+ leftShoulderX:0,leftShoulderY:0,leftShoulder:0,
+ leftElbowX:0,leftElbowY:0,leftElbow:0,
+ leftWristX:0,leftWristY:0,leftWrist:0,
+ rightShoulderX:0,rightShoulderY:0,rightShoulder:0,
+ rightElbowX:0,rightElbowY:0,rightElbow:0,
+ rightWristX:0,rightWristY:0,rightWrist:0,
+ leftHipX:0,leftHipY:0,leftHip:0,
+ leftKneeX:0,leftKneeY:0,leftKnee:0,
+ leftAnkleX:0,leftAnkleY:0,leftAnkle:0,
+ rightHipX:0,rightHipY:0,rightHip:0,
+ rightKneeX:0,rightKneeY:0,rightKnee:0,
+ rightAnkleX:0,rightAnkleY:0,rightAnkle:0
+};function mul(A,B){
+ return [
+   A[0]*B[0]+A[2]*B[1],
+   A[1]*B[0]+A[3]*B[1],
+   A[0]*B[2]+A[2]*B[3],
+   A[1]*B[2]+A[3]*B[3],
+   A[0]*B[4]+A[2]*B[5]+A[4],
+   A[1]*B[4]+A[3]*B[5]+A[5]
+ ];
+}
+function rot(deg,pivot){
+ var cx=pivot[0], cy=pivot[1];
+ var r=deg*Math.PI/180, c=Math.cos(r), s=Math.sin(r);
+ return [c,s,-s,c,cx-c*cx+s*cy,cy-s*cx-c*cy];
+}
+function tr(x,y){ return [1,0,0,1,x,y]; }
+function rt(angle,pivot,x,y){ return mul(tr(x,y),rot(angle,pivot)); }
+function point(M,p){
+ return [M[0]*p[0]+M[2]*p[1]+M[4], M[1]*p[0]+M[3]*p[1]+M[5]];
+}
+function matrices(J,state){
+ var G=tr(state.globalX,state.globalY);
+ var P=mul(G,rt(state.pelvisRot,J.pelvis,state.pelvisX,state.pelvisY));
+ var W=mul(P,rt(state.waist,J.lumbar,state.torsoX,state.torsoY));
+ var H=mul(W,rt(state.head,J.neck,state.headX,state.headY));
+
+ var LS=mul(W,rt(state.leftShoulder,J.shoulder_L,state.leftShoulderX,state.leftShoulderY));
+ var LE=mul(LS,rt(state.leftElbow,J.elbow_L,state.leftElbowX,state.leftElbowY));
+ var LW=mul(LE,rt(state.leftWrist,J.wrist_L,state.leftWristX,state.leftWristY));
+
+ var RS=mul(W,rt(state.rightShoulder,J.shoulder_R,state.rightShoulderX,state.rightShoulderY));
+ var RE=mul(RS,rt(state.rightElbow,J.elbow_R,state.rightElbowX,state.rightElbowY));
+ var RW=mul(RE,rt(state.rightWrist,J.wrist_R,state.rightWristX,state.rightWristY));
+
+ var LH=mul(P,rt(state.leftHip,J.hip_L,state.leftHipX,state.leftHipY));
+ var LK=mul(LH,rt(state.leftKnee,J.knee_L,state.leftKneeX,state.leftKneeY));
+ var LA=mul(LK,rt(state.leftAnkle,J.ankle_L,state.leftAnkleX,state.leftAnkleY));
+
+ var RH=mul(P,rt(state.rightHip,J.hip_R,state.rightHipX,state.rightHipY));
+ var RK=mul(RH,rt(state.rightKnee,J.knee_R,state.rightKneeX,state.rightKneeY));
+ var RA=mul(RK,rt(state.rightAnkle,J.ankle_R,state.rightAnkleX,state.rightAnkleY));
+
+ return {G:G,P:P,W:W,H:H,LS:LS,LE:LE,LW:LW,RS:RS,RE:RE,RW:RW,LH:LH,LK:LK,LA:LA,RH:RH,RK:RK,RA:RA};
+}
+function worldJoints(J,state){
+ var M=matrices(J,state);
+ return {
+ root:point(M.G,J.root), pelvis:point(M.P,J.pelvis), lumbar:point(M.W,J.lumbar),
+ chest:point(M.W,J.chest), neck:point(M.W,J.neck), head:point(M.H,J.head),
+ shoulder_L:point(M.LS,J.shoulder_L), elbow_L:point(M.LE,J.elbow_L),
+ wrist_L:point(M.LW,J.wrist_L), hand_L:point(M.LW,J.hand_L),
+ shoulder_R:point(M.RS,J.shoulder_R), elbow_R:point(M.RE,J.elbow_R),
+ wrist_R:point(M.RW,J.wrist_R), hand_R:point(M.RW,J.hand_R),
+ hip_L:point(M.LH,J.hip_L), knee_L:point(M.LK,J.knee_L),
+ ankle_L:point(M.LA,J.ankle_L), foot_L:point(M.LA,J.foot_L),
+ hip_R:point(M.RH,J.hip_R), knee_R:point(M.RK,J.knee_R),
+ ankle_R:point(M.RA,J.ankle_R), foot_R:point(M.RA,J.foot_R)
+ };
+}var links=[
+ ["pelvis","lumbar","spine"],["lumbar","chest","spine"],["chest","neck","spine"],["neck","head","spine"],
+ ["chest","shoulder_L",""],["shoulder_L","elbow_L",""],["elbow_L","wrist_L",""],["wrist_L","hand_L",""],
+ ["chest","shoulder_R",""],["shoulder_R","elbow_R",""],["elbow_R","wrist_R",""],["wrist_R","hand_R",""],
+ ["pelvis","hip_L",""],["hip_L","knee_L",""],["knee_L","ankle_L",""],["ankle_L","foot_L",""],
+ ["pelvis","hip_R",""],["hip_R","knee_R",""],["knee_R","ankle_R",""],["ankle_R","foot_R",""]
+ ];
+const c=document.getElementById('c'),ctx=c.getContext('2d'),view=document.getElementById('view'),count=document.getElementById('count'),out=document.getElementById('out');Object.keys(J_BY_VIEW).forEach(k=>view.add(new Option(k,k)));let token=0;
+function draw(t,n,basic){ctx.clearRect(0,0,600,680);if(basic){ctx.fillStyle='#85c6dd';ctx.fillRect(280+220*Math.sin(t*6),310,40,40);return;}const J=J_BY_VIEW[view.value],cols=Math.ceil(Math.sqrt(n)),rows=Math.ceil(n/cols),scale=Math.min(600/cols/1050,680/rows/1500);for(let i=0;i<n;i++){let a=t*6+i*.6,s={...initial,leftShoulder:35*Math.sin(a),rightShoulder:-35*Math.sin(a),leftElbow:-35-30*Math.sin(a),rightElbow:35-30*Math.sin(a),leftHip:20*Math.sin(a),rightHip:-20*Math.sin(a),leftKnee:15+15*Math.sin(a),rightKnee:15-15*Math.sin(a),waist:5*Math.sin(a)};let p=worldJoints(J,s);ctx.save();ctx.translate((i%cols+.5)*600/cols,(Math.floor(i/cols)+.5)*680/rows);ctx.scale(scale,scale);ctx.translate(-450,-750);ctx.strokeStyle='#85c6dd';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();for(const [a,b] of links){ctx.moveTo(...p[a]);ctx.lineTo(...p[b]);}ctx.stroke();ctx.fillStyle='#e8c28b';for(const v of Object.values(p)){ctx.beginPath();ctx.arc(v[0],v[1],10,0,Math.PI*2);ctx.fill();}ctx.restore();}}
+function run(basic){let id=++token,n=+count.value,start=null,last=null,gaps=[],cost=[],frames=0;out.textContent='Running…';function frame(now){if(id!==token)return;if(start===null)start=now;if(last!==null)gaps.push(now-last);last=now;let a=performance.now();draw((now-start)/1000,n,basic);cost.push(performance.now()-a);frames++;if(now-start<5000){requestAnimationFrame(frame);return;}let elapsed=now-start,sorted=gaps.slice().sort((a,b)=>a-b);out.textContent=`Mode: ${basic?'browser baseline':'skeleton'}\nCharacters: ${basic?0:n}\nView: ${view.value}\nElapsed: ${elapsed.toFixed(0)} ms\nFPS: ${(gaps.length*1000/elapsed).toFixed(1)}\nFrames: ${frames}\nFrame gap p95: ${(sorted[Math.max(0,Math.ceil(sorted.length*.95)-1)]||0).toFixed(1)} ms\nWorst gap: ${Math.max(0,...gaps).toFixed(1)} ms\nMean JS + draw submission: ${(cost.reduce((a,b)=>a+b,0)/cost.length).toFixed(2)} ms`; }requestAnimationFrame(frame);}
+document.getElementById('run').onclick=()=>run(false);document.getElementById('basic').onclick=()=>run(true);document.getElementById('stop').onclick=()=>{token++;out.textContent='Stopped';};view.onchange=count.onchange=()=>{token++;draw(0,+count.value,false);out.textContent='Ready';};draw(0,1,false);
+</script></html>
